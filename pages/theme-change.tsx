@@ -1,4 +1,5 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, FC, useState } from "react";
+import { GetServerSideProps } from "next";
 
 import {
   Card,
@@ -11,8 +12,12 @@ import {
 } from "@mui/material";
 import { Layout } from "../components/layouts";
 
-const ThemeChangePage = () => {
-  const [currentTheme, setCurrentTheme] = useState("light");
+interface Props {
+  theme: string;
+}
+
+const ThemeChangePage: FC<Props> = ({ theme }) => {
+  const [currentTheme, setCurrentTheme] = useState(theme);
 
   const onThemeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCurrentTheme(e.target.value);
@@ -46,6 +51,18 @@ const ThemeChangePage = () => {
       </Card>
     </Layout>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const { theme = "light", name = "no name" } = req.cookies;
+
+  const validTheme = ["light", "dark", "custom"];
+  return {
+    props: {
+      theme: validTheme.includes(theme) ? theme : "dark",
+      name,
+    },
+  };
 };
 
 export default ThemeChangePage;
